@@ -2,6 +2,7 @@
 	"name": "@rocket.chat/omnichannel-transcript",
 	"version": "0.4.52",
 	"private": true,
+	"type": "module",
 	"description": "Rocket.Chat service",
 	"keywords": [
 		"rocketchat"
