@@ -10,7 +10,7 @@ const additionalPackages = {};
 const fs = Npm.require('fs');
 const path = Npm.require('path');
 
-/** Git on Windows may check out the symlink as a plain file containing the target path; Meteor needs a real dir or symlink. */
+/** Git on Windows may check out the symlink as a plain file containing the target path; Meteor needs a real directory under i18n/. */
 function ensureI18nDir(rocketchatI18nRoot) {
 	const i18nPath = path.join(rocketchatI18nRoot, 'i18n');
 	if (!fs.existsSync(i18nPath)) {
@@ -21,8 +21,12 @@ function ensureI18nDir(rocketchatI18nRoot) {
 		const rel = fs.readFileSync(i18nPath, 'utf8').trim();
 		const resolved = path.resolve(rocketchatI18nRoot, rel);
 		fs.unlinkSync(i18nPath);
-		const target = path.relative(rocketchatI18nRoot, resolved);
-		fs.symlinkSync(target, i18nPath);
+		if (!fs.existsSync(resolved)) {
+			throw new Error(
+				`rocketchat-i18n: missing ${resolved}. Build workspace packages (yarn build) so packages/i18n/dist/resources exists.`,
+			);
+		}
+		fs.cpSync(resolved, i18nPath, { recursive: true });
 	}
 	return i18nPath;
 }
