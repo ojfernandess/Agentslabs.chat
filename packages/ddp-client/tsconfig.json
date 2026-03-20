@@ -2,7 +2,7 @@
 	"extends": "@rocket.chat/tsconfig/client.json",
 	"compilerOptions": {
 		"target": "es6",
-		"module": "commonjs",
+		"module": "Node16",
 		"esModuleInterop": true,
 		"sourceMap": true,
 	},

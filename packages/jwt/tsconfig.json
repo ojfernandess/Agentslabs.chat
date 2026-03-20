@@ -2,7 +2,7 @@
 	"extends": "@rocket.chat/tsconfig/server.json",
 	"compilerOptions": {
 		"declaration": true,
-		"module": "commonjs",
+		"module": "Node16",
 		"rootDir": "./src",
 		"outDir": "./dist"
 	},

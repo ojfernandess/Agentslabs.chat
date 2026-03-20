@@ -2,7 +2,7 @@
 	"extends": "@rocket.chat/tsconfig/base.json",
 	"compilerOptions": {
 		"target": "es2024",
-		"module": "node18",
+		"module": "Node16",
 		"moduleResolution": "node16",
 		"rewriteRelativeImportExtensions": true,
 		"erasableSyntaxOnly": true,

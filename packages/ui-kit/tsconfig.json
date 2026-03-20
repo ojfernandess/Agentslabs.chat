@@ -2,7 +2,7 @@
 	"extends": "@rocket.chat/tsconfig/base.json",
 	"compilerOptions": {
 		"target": "es2024",
-		"module": "esnext",
+		"module": "Node16",
 		"lib": ["ES2023"],
 		"declaration": true,
 		"declarationMap": true,

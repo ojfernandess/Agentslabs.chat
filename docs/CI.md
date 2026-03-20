@@ -15,7 +15,7 @@ Local dev on Linux ARM: install the same packages (`sudo apt install build-essen
 
 ## TypeScript + Jest (`@rocket.chat/jest-presets/client`)
 
-[`packages/tsconfig/base.json`](../packages/tsconfig/base.json) sets `"moduleResolution": "node16"` so TypeScript resolves `package.json` **`exports`** (required for `@rocket.chat/jest-presets/client` and similar).
+[`packages/tsconfig/base.json`](../packages/tsconfig/base.json) sets `"moduleResolution": "node16"` and **`"module": "Node16"`** (TypeScript requires matching `module` / `moduleResolution` for the `node16` resolver). Packages that override `module` must keep the same pairing.
 
 ## Workspace build order
 
