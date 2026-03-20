@@ -89,6 +89,15 @@ runs:
       run: |
         yarn config set supportedArchitectures --json '{"os": ["linux"], "cpu": ["arm64", "x64"], "libc": ["glibc", "musl"]}'
 
+    # bcrypt, sharp, isolated-vm, @swc/core, esbuild, etc. need a toolchain when prebuilds are missing (common on Linux ARM64).
+    - name: Install native build dependencies (Linux)
+      if: ${{ inputs.install && runner.os == 'Linux' }}
+      shell: bash
+      run: |
+        sudo apt-get update -qq
+        sudo apt-get install -y build-essential python3 g++ make
+        echo "PYTHON=/usr/bin/python3" >> "$GITHUB_ENV"
+
     - name: yarn install
       if: inputs.install && inputs.type == 'development'
       shell: bash
