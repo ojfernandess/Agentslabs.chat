@@ -10,17 +10,44 @@ const additionalPackages = {};
 const fs = Npm.require('fs');
 const path = Npm.require('path');
 
-/** Git on Windows may check out the symlink as a plain file containing the target path; Meteor needs a real directory under i18n/. */
+/**
+ * Meteor needs i18n/ to be a real directory for api.addFiles. Git may leave:
+ * - a plain file (Windows) with a relative path inside
+ * - a symlink (Linux) — lstat is not a "directory", but realpath may be fine
+ */
 function ensureI18nDir(rocketchatI18nRoot) {
 	const i18nPath = path.join(rocketchatI18nRoot, 'i18n');
 	if (!fs.existsSync(i18nPath)) {
 		return i18nPath;
 	}
-	const st = fs.lstatSync(i18nPath);
-	if (st.isFile()) {
+	const lst = fs.lstatSync(i18nPath);
+	if (lst.isDirectory()) {
+		return i18nPath;
+	}
+	if (lst.isSymbolicLink()) {
+		try {
+			const dest = fs.realpathSync(i18nPath);
+			if (fs.statSync(dest).isDirectory()) {
+				return i18nPath;
+			}
+		} catch (e) {
+			// broken symlink — replace from target path
+		}
+		const linkTarget = fs.readlinkSync(i18nPath);
+		const resolved = path.resolve(path.dirname(i18nPath), linkTarget);
+		fs.rmSync(i18nPath, { force: true });
+		if (!fs.existsSync(resolved)) {
+			throw new Error(
+				`rocketchat-i18n: missing ${resolved}. Build workspace packages (yarn build) so packages/i18n/dist/resources exists.`,
+			);
+		}
+		fs.cpSync(resolved, i18nPath, { recursive: true });
+		return i18nPath;
+	}
+	if (lst.isFile()) {
 		const rel = fs.readFileSync(i18nPath, 'utf8').trim();
 		const resolved = path.resolve(rocketchatI18nRoot, rel);
-		fs.unlinkSync(i18nPath);
+		fs.rmSync(i18nPath, { force: true });
 		if (!fs.existsSync(resolved)) {
 			throw new Error(
 				`rocketchat-i18n: missing ${resolved}. Build workspace packages (yarn build) so packages/i18n/dist/resources exists.`,
