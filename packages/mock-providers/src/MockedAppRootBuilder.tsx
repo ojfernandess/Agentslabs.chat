@@ -19,7 +19,7 @@ import type {
 	StreamNames,
 } from '@rocket.chat/ddp-client';
 import { Emitter } from '@rocket.chat/emitter';
-import languages from '@rocket.chat/i18n/dist/languages';
+import languagesModule = require('@rocket.chat/i18n/dist/languages');
 import { createPredicateFromFilter } from '@rocket.chat/mongo-adapter';
 import type { Method, OperationParams, OperationResult, PathPattern, UrlParams } from '@rocket.chat/rest-typings';
 import type {
@@ -55,6 +55,8 @@ import { useEffect, useReducer, useSyncExternalStore } from 'react';
 import { I18nextProvider, initReactI18next } from 'react-i18next';
 
 import { MockedDeviceContext } from './MockedDeviceContext';
+
+const languages: readonly string[] = languagesModule.default;
 
 type Mutable<T> = {
 	-readonly [P in keyof T]: T[P];
