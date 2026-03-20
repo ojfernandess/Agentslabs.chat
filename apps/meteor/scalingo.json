@@ -1,0 +1,14 @@
+{
+  "name": "Agents Labs Chat PRO",
+  "repository": "https://github.com/ojfernandess/Agentslabs.chat",
+  "description": "Agents Labs Chat PRO — team communications platform",
+  "logo": "https://raw.githubusercontent.com/ojfernandess/Agentslabs.chat/main/agentslabslogo.png",
+  "website": "https://github.com/ojfernandess/Agentslabs.chat",
+  "addons": ["scalingo-mongodb"],
+  "env": {
+    "DEPLOY_PLATFORM": {
+      "description": "Platform name",
+      "value": "scalingo"
+    }
+  }
+}

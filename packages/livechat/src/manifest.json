@@ -1,0 +1,8 @@
+{
+  "name": "Agents Labs Livechat",
+  "short_name": "Agents Labs",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#fff"
+}

@@ -1,0 +1,21 @@
+{
+  "name": "Agents Labs Chat PRO",
+  "description": "Agents Labs Chat PRO — team communications platform.",
+  "repository": "https://github.com/ojfernandess/Agentslabs.chat",
+  "logo": "https://raw.githubusercontent.com/ojfernandess/Agentslabs.chat/main/agentslabslogo.png",
+  "keywords": ["meteor", "social", "community", "chat", "agentslabs"],
+  "website": "https://github.com/ojfernandess/Agentslabs.chat",
+  "env": {
+    "BUILDPACK_URL": "https://github.com/RocketChat/meteor-buildpack-horse.git",
+    "METEOR_APP_DIR": "apps/meteor/",
+    "HEROKU_APP_NAME": {
+      "description": "Please re-enter your App Name from the top.",
+      "required": true
+    },
+    "DEPLOY_PLATFORM": "heroku"
+  },
+  "addons": [
+    "mongolab",
+    "logentries"
+  ]
+}

@@ -1,0 +1,81 @@
+{
+	"name": "agentslabs-chat-pro",
+	"version": "8.3.0-develop",
+	"private": true,
+	"description": "Agents Labs Chat PRO — team communications (fork of Rocket.Chat)",
+	"homepage": "https://github.com/ojfernandess/Agentslabs.chat",
+	"bugs": {
+		"url": "https://github.com/ojfernandess/Agentslabs.chat/issues"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/ojfernandess/Agentslabs.chat.git"
+	},
+	"license": "MIT",
+	"author": "",
+	"main": "index.js",
+	"workspaces": [
+		"apps/*",
+		"packages/*",
+		"ee/apps/*",
+		"ee/packages/*",
+		"apps/meteor/ee/server/services"
+	],
+	"scripts": {
+		"build": "turbo run build",
+		"build:services": "turbo run build --filter=rocketchat-services...",
+		"dev": "turbo run dev --env-mode=loose --parallel --filter=@rocket.chat/meteor...",
+		"dsv": "turbo run dsv --env-mode=loose --filter=@rocket.chat/meteor...",
+		"ms": "turbo run ms --env-mode=loose",
+		"fossify": "TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\"}' ts-node scripts/fossify.ts",
+		"fuselage": "./fuselage.sh",
+		"lint": "turbo run lint",
+		"storybook": "yarn workspace @rocket.chat/meteor run storybook",
+		"test-storybook": "turbo run test-storybook",
+		"testunit": "turbo run testunit"
+	},
+	"resolutions": {
+		"@sematext/gc-stats@npm:^1.5.9": "patch:@sematext/gc-stats@npm%3A1.5.9#~/.yarn/patches/@sematext-gc-stats-npm-1.5.9-01e77be4d0.patch",
+		"adm-zip": "0.5.9",
+		"cross-spawn": "7.0.6",
+		"drachtio-srf": "patch:drachtio-srf@npm%3A5.0.12#~/.yarn/patches/drachtio-srf-npm-5.0.12-b0b1afaad6.patch",
+		"lodash": "4.17.21",
+		"minimist": "1.2.6",
+		"mongodb": "6.10.0",
+		"underscore": "1.13.7",
+		"yoga-layout@npm:^3.2.1": "patch:yoga-layout@npm%3A3.2.1#~/.yarn/patches/yoga-layout-npm-3.2.1-51ec934670.patch",
+		"@react-pdf/layout@npm:^4.4.2": "patch:@react-pdf/layout@npm%3A4.4.2#~/.yarn/patches/@react-pdf-layout-npm-4.4.2-6c2e3312fa.patch"
+	},
+	"dependencies": {
+		"@types/stream-buffers": "^3.0.8",
+		"node-gyp": "^10.2.0"
+	},
+	"devDependencies": {
+		"@changesets/cli": "^2.27.11",
+		"@rocket.chat/eslint-config": "workspace:~",
+		"@types/chart.js": "^2.9.41",
+		"@types/js-yaml": "^4.0.9",
+		"@types/node": "~22.16.5",
+		"eslint": "~9.39.3",
+		"eslint-plugin-you-dont-need-lodash-underscore": "~6.14.0",
+		"ts-node": "^10.9.2",
+		"turbo": "2.8.12",
+		"typescript": "~5.9.3"
+	},
+	"packageManager": "yarn@4.12.0",
+	"engines": {
+		"node": "22.16.0",
+		"yarn": "4.12.0"
+	},
+	"volta": {
+		"node": "22.16.0",
+		"yarn": "4.12.0"
+	},
+	"houston": {
+		"minTag": "0.55.0-rc.0",
+		"updateFiles": [
+			"package.json",
+			"apps/meteor/app/utils/rocketchat.info"
+		]
+	}
+}

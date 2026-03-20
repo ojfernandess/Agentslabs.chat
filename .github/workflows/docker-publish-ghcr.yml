@@ -1,0 +1,121 @@
+# Build Meteor bundle and push runtime image to GitHub Container Registry.
+# Use this image in EasyPanel (Docker Hub section → Image: ghcr.io/.../...).
+
+name: Publish Docker image (GHCR / EasyPanel)
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: docker-publish-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: '22.16.0'
+  DENO_VERSION: '1.43.5'
+
+jobs:
+  packages-build:
+    name: Workspace packages
+    runs-on: ubuntu-latest
+    outputs:
+      source-hash: ${{ steps.hash.outputs.hash }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - id: hash
+        run: |
+          tar -cf /tmp/source.tar --sort=name --owner=0 --group=0 --mtime='1970-01-01' \
+            --exclude='.git' --exclude='node_modules' --exclude='**/node_modules' .
+          echo hash=$(sha256sum /tmp/source.tar | awk '{ print $1 }') >> "$GITHUB_OUTPUT"
+
+      - name: Swap
+        uses: pierotofy/set-swap-space@master
+        with:
+          swap-size-gb: 8
+
+      - name: Setup Node
+        uses: ./.github/actions/setup-node
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          deno-version: ${{ env.DENO_VERSION }}
+          install: true
+          type: development
+          cache-modules: true
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          HARDENED_MODE: '1'
+
+      - uses: rharkor/caching-for-turbo@v1.8
+
+      - name: yarn build
+        run: yarn build
+
+      - name: Archive generated sources
+        run: |
+          tar -czf /tmp/RocketChat-packages-build.tar.gz \
+            $(git ls-files -oi --exclude-standard -- \
+              ':(exclude)node_modules/*' ':(exclude)**/node_modules/*' ':(exclude)**/.meteor/*' \
+              ':(exclude)**/.turbo/*' ':(exclude).turbo/*' ':(exclude)**/.yarn/*' ':(exclude).yarn/*' \
+              ':(exclude).git/*')
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: packages-build
+          path: /tmp/RocketChat-packages-build.tar.gz
+          retention-days: 2
+
+  meteor-docker:
+    name: Meteor bundle + Docker push
+    needs: [packages-build]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Swap
+        uses: pierotofy/set-swap-space@master
+        with:
+          swap-size-gb: 8
+
+      - uses: ./.github/actions/meteor-build
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          deno-version: ${{ env.DENO_VERSION }}
+          source-hash: ${{ needs.packages-build.outputs.source-hash }}
+          type: production
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Extract bundle for Docker context
+        run: |
+          mkdir -p /tmp/dockerctx
+          tar -xzf /tmp/Rocket.Chat.tar.gz -C /tmp/dockerctx
+          ls -la /tmp/dockerctx/bundle | head
+
+      - name: Docker tags (lowercase)
+        id: meta
+        run: |
+          OWNER_REPO_LOWER=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          echo "image_base=ghcr.io/${OWNER_REPO_LOWER}" >> "$GITHUB_OUTPUT"
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: /tmp/dockerctx
+          file: apps/meteor/.docker/Dockerfile.alpine
+          push: true
+          tags: |
+            ${{ steps.meta.outputs.image_base }}:latest
+            ${{ steps.meta.outputs.image_base }}:${{ github.sha }}

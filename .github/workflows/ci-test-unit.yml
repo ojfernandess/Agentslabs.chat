@@ -1,0 +1,53 @@
+name: Tests Unit
+
+on:
+  workflow_call:
+    inputs:
+      node-version:
+        required: true
+        type: string
+      deno-version:
+        required: true
+        type: string
+      enterprise-license:
+        required: false
+        type: string
+    secrets:
+      CODECOV_TOKEN:
+        required: false
+
+env:
+  MONGO_URL: mongodb://localhost:27017/rocketchat?replicaSet=rs0&directConnection=true
+  TOOL_NODE_FLAGS: ${{ vars.TOOL_NODE_FLAGS }}
+  ENTERPRISE_LICENSE: ${{ inputs.enterprise-license }}
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04-arm
+
+    name: Unit Tests
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup NodeJS
+        uses: ./.github/actions/setup-node
+        with:
+          node-version: ${{ inputs.node-version }}
+          deno-version: ${{ inputs.deno-version }}
+          cache-modules: true
+          install: true
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - uses: rharkor/caching-for-turbo@v1.8
+
+      - uses: ./.github/actions/restore-packages
+
+      - name: Unit Test
+        run: yarn testunit --concurrency=1
+
+      - uses: codecov/codecov-action@v5
+        with:
+          flags: unit
+          verbose: true
+          token: ${{ secrets.CODECOV_TOKEN }}

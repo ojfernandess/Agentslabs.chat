@@ -1,0 +1,271 @@
+import type { IMessage, IRoom, IUser } from '@rocket.chat/core-typings';
+import {
+	Field,
+	FieldGroup,
+	ToggleSwitch,
+	TextInput,
+	TextAreaInput,
+	Icon,
+	Box,
+	FieldHint,
+	FieldLabel,
+	FieldRow,
+	FieldError,
+} from '@rocket.chat/fuselage';
+import { useEffectEvent } from '@rocket.chat/fuselage-hooks';
+import { GenericModal } from '@rocket.chat/ui-client';
+import { useTranslation, useEndpoint } from '@rocket.chat/ui-contexts';
+import { useMutation } from '@tanstack/react-query';
+import { useId, useState } from 'react';
+import { useForm, Controller } from 'react-hook-form';
+
+import { useEncryptedRoomDescription } from '../../navbar/NavBarPagesGroup/actions/useEncryptedRoomDescription';
+import { useGoToRoom } from '../../views/room/hooks/useGoToRoom';
+import RoomAutoComplete from '../RoomAutoComplete';
+import UserAutoCompleteMultiple from '../UserAutoCompleteMultiple';
+import DefaultParentRoomField from './DefaultParentRoomField';
+
+type CreateDiscussionFormValues = {
+	name: string;
+	parentRoom: IRoom['_id'];
+	encrypted: boolean;
+	usernames: Array<IUser['username']>;
+	firstMessage: string;
+	topic: string;
+};
+
+type CreateDiscussionProps = {
+	parentMessageId?: IMessage['_id'];
+	encryptedParentRoom?: boolean;
+	onClose: () => void;
+	defaultParentRoom?: IRoom['_id'];
+	nameSuggestion?: string;
+};
+
+const CreateDiscussion = ({
+	onClose,
+	defaultParentRoom,
+	parentMessageId,
+	nameSuggestion,
+	encryptedParentRoom = false,
+}: CreateDiscussionProps) => {
+	const t = useTranslation();
+
+	const [encryptedDisabled, setEncryptedDisabled] = useState(encryptedParentRoom);
+
+	const {
+		formState: { errors },
+		handleSubmit,
+		control,
+		watch,
+		setValue,
+	} = useForm({
+		mode: 'onBlur',
+		defaultValues: {
+			name: nameSuggestion || '',
+			parentRoom: '',
+			encrypted: encryptedParentRoom,
+			usernames: [],
+			firstMessage: '',
+			topic: '',
+		},
+	});
+
+	const onParentRoomChange = useEffectEvent((room: IRoom | undefined) => {
+		if (!room) {
+			return;
+		}
+		setValue('encrypted', room.encrypted === true);
+		setEncryptedDisabled(room.encrypted === true);
+	});
+
+	const { encrypted } = watch();
+
+	const createDiscussion = useEndpoint('POST', '/v1/rooms.createDiscussion');
+
+	const goToRoom = useGoToRoom();
+
+	const createDiscussionMutation = useMutation({
+		mutationFn: createDiscussion,
+		onSuccess: ({ discussion }) => {
+			goToRoom(discussion._id);
+			onClose();
+		},
+	});
+
+	const handleCreate = async ({ name, parentRoom, encrypted, usernames, firstMessage, topic }: CreateDiscussionFormValues) => {
+		createDiscussionMutation.mutate({
+			prid: defaultParentRoom || parentRoom,
+			t_name: name,
+			users: usernames,
+			reply: encrypted ? undefined : firstMessage,
+			topic,
+			...(parentMessageId && { pmid: parentMessageId }),
+		});
+	};
+
+	const getEncryptedHint = useEncryptedRoomDescription('discussion');
+
+	const parentRoomId = useId();
+	const encryptedId = useId();
+	const discussionNameId = useId();
+	const membersId = useId();
+	const firstMessageId = useId();
+	const topicId = useId();
+
+	return (
+		<GenericModal
+			variant='warning'
+			icon={null}
+			title={t('Discussion_title')}
+			onCancel={onClose}
+			wrapperFunction={(props) => <Box is='form' onSubmit={handleSubmit(handleCreate)} {...props} />}
+			confirmText={t('Create')}
+			cancelText={t('Cancel')}
+			confirmLoading={createDiscussionMutation.isPending}
+		>
+			<Box mbe={24}>{t('Discussion_description')}</Box>
+			<FieldGroup>
+				<Field>
+					<FieldLabel htmlFor={parentRoomId} required>
+						{t('Discussion_target_channel')}
+					</FieldLabel>
+					<FieldRow>
+						{defaultParentRoom && (
+							<Controller
+								control={control}
+								name='parentRoom'
+								render={() => <DefaultParentRoomField defaultParentRoom={defaultParentRoom} id={parentRoomId} />}
+							/>
+						)}
+						{!defaultParentRoom && (
+							<Controller
+								control={control}
+								name='parentRoom'
+								rules={{ required: t('Required_field', { field: t('Discussion_target_channel') }) }}
+								render={({ field: { name, onBlur, onChange, value } }) => (
+									<RoomAutoComplete
+										name={name}
+										onBlur={onBlur}
+										onChange={onChange}
+										value={value}
+										id={parentRoomId}
+										placeholder={t('Search_options')}
+										disabled={Boolean(defaultParentRoom)}
+										aria-invalid={Boolean(errors.parentRoom)}
+										aria-required='true'
+										aria-describedby={`${parentRoomId}-error`}
+										setSelectedRoom={onParentRoomChange}
+										renderRoomIcon={({ encrypted }) => (encrypted ? <Icon name='key' /> : null)}
+									/>
+								)}
+							/>
+						)}
+					</FieldRow>
+					{errors.parentRoom && (
+						<FieldError role='alert' id={`${parentRoomId}-error`}>
+							{errors.parentRoom.message}
+						</FieldError>
+					)}
+				</Field>
+				<Field>
+					<FieldLabel htmlFor={discussionNameId} required>
+						{t('Name')}
+					</FieldLabel>
+					<FieldRow>
+						<Controller
+							name='name'
+							control={control}
+							rules={{ required: t('Required_field', { field: t('Name') }) }}
+							render={({ field }) => (
+								<TextInput
+									id={discussionNameId}
+									{...field}
+									aria-invalid={Boolean(errors.name)}
+									aria-required='true'
+									aria-describedby={errors.name ? `${discussionNameId}-error` : undefined}
+									addon={<Icon name='baloons' size='x20' />}
+								/>
+							)}
+						/>
+					</FieldRow>
+					{errors.name && (
+						<FieldError role='alert' id={`${discussionNameId}-error`}>
+							{errors.name.message}
+						</FieldError>
+					)}
+				</Field>
+				<Field>
+					<FieldLabel htmlFor={topicId}>{t('Topic')}</FieldLabel>
+					<FieldRow>
+						<Controller
+							name='topic'
+							control={control}
+							render={({ field }) => <TextInput id={topicId} {...field} aria-describedby={`${topicId}-hint`} />}
+						/>
+					</FieldRow>
+					<FieldRow>
+						<FieldHint id={`${topicId}-hint`}>{t('Displayed_next_to_name')}</FieldHint>
+					</FieldRow>
+				</Field>
+				<Field>
+					<FieldLabel htmlFor={membersId}>{t('Members')}</FieldLabel>
+					<FieldRow>
+						<Controller
+							control={control}
+							name='usernames'
+							render={({ field: { name, onChange, value, onBlur } }) => (
+								<UserAutoCompleteMultiple
+									id={membersId}
+									name={name}
+									onChange={onChange}
+									value={value}
+									onBlur={onBlur}
+									placeholder={t('Add_people')}
+								/>
+							)}
+						/>
+					</FieldRow>
+				</Field>
+				<Field>
+					<FieldLabel htmlFor={firstMessageId}>{t('Discussion_first_message_title')}</FieldLabel>
+					<FieldRow>
+						<Controller
+							control={control}
+							name='firstMessage'
+							render={({ field }) => (
+								<TextAreaInput
+									id={firstMessageId}
+									{...field}
+									rows={5}
+									disabled={encrypted}
+									aria-describedby={encrypted ? `${firstMessageId}-encrypted-hint` : `${firstMessageId}-hint`}
+								/>
+							)}
+						/>
+					</FieldRow>
+					{encrypted ? (
+						<FieldHint id={`${firstMessageId}-encrypted-hint`}>{t('Discussion_first_message_disabled_due_to_e2e')}</FieldHint>
+					) : (
+						<FieldHint id={`${firstMessageId}-hint`}>{t('First_message_hint')}</FieldHint>
+					)}
+				</Field>
+				<Field>
+					<FieldRow>
+						<FieldLabel htmlFor={encryptedId}>{t('Encrypted')}</FieldLabel>
+						<Controller
+							control={control}
+							name='encrypted'
+							render={({ field: { value, ...field } }) => (
+								<ToggleSwitch id={encryptedId} {...field} checked={value} disabled={encryptedDisabled} />
+							)}
+						/>
+					</FieldRow>
+					<FieldHint id={`${encryptedId}-hint`}>{getEncryptedHint({ isPrivate: true, encrypted })}</FieldHint>
+				</Field>
+			</FieldGroup>
+		</GenericModal>
+	);
+};
+
+export default CreateDiscussion;
