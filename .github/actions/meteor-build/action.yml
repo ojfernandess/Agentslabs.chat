@@ -147,6 +147,18 @@ runs:
       run: |
         tar -xzf /tmp/RocketChat-packages-build.tar.gz -C .
 
+    # Git on Windows may commit the symlink target as a plain file; Meteor expects a directory here.
+    # The packages-build tarball only adds untracked outputs, so replace the placeholder with a real symlink.
+    - name: Fix rocketchat-i18n i18n path
+      shell: bash
+      run: |
+        set -euo pipefail
+        if [ ! -d packages/i18n/dist/resources ]; then
+          echo "::error::packages/i18n/dist/resources is missing (packages build output)."
+          exit 1
+        fi
+        ( cd apps/meteor/packages/rocketchat-i18n && rm -f i18n && ln -sfn ../../../../packages/i18n/dist/resources i18n )
+
     - name: Build Rocket.Chat
       shell: bash
       if: steps.cache-build.outputs.cache-hit != 'true'
