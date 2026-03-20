@@ -1,1 +1,1 @@
-./dist/preview.d.ts
+export * from './dist/preview';

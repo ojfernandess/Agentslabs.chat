@@ -1,1 +1,1 @@
-./dist/preview.js
+module.exports = require('./dist/preview.js');
