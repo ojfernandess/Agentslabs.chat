@@ -1,15 +1,12 @@
 {
-	"extends": "@rocket.chat/tsconfig/base.json",
+	"extends": "./tsconfig.json",
 	"compilerOptions": {
-		"rootDir": "src",
 		"outDir": "dist",
 		"target": "ES2015",
 		"module": "Node16",
-		"moduleResolution": "node16",
 		"declaration": true,
 		"declarationMap": true,
-		"sourceMap": true
+		"sourceMap": true,
 	},
-	"include": ["src"],
 	"exclude": ["**/*.spec.ts"]
 }

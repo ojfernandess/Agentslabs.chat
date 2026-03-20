@@ -44,19 +44,6 @@
 		"@rocket.chat/meteor#build:ci": {
 			"env": ["BABEL_ENV"],
 			"cache": false
-		},
-		"@rocket.chat/sha256#build": {
-			"dependsOn": ["^build"],
-			"outputs": ["dist/**"],
-			"cache": false
-		},
-		"@rocket.chat/media-calls#build-preview": {
-			"dependsOn": ["build", "^build"],
-			"outputs": ["storybook-static/**", ".storybook/**", "dist/**"]
-		},
-		"@rocket.chat/media-signaling#build-preview": {
-			"dependsOn": ["build", "^build"],
-			"outputs": ["storybook-static/**", ".storybook/**", "dist/**"]
 		}
 	}
 }

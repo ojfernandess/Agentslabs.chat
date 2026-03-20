@@ -14,7 +14,10 @@ const VerticalTemplate = ({ children }: { children: ReactNode }): ReactElement =
 	const customBackground = useAssetWithDarkModePath('background');
 
 	return (
-		<VerticalWizardLayout background={customBackground} logo={<RegistrationBrandLogo hideLogo={hideLogo} src={customLogo} />}>
+		<VerticalWizardLayout
+			background={customBackground}
+			logo={<RegistrationBrandLogo hideLogo={hideLogo} src={customLogo} />}
+		>
 			<VerticalWizardLayoutTitle>
 				<RegisterTitle />
 			</VerticalWizardLayoutTitle>

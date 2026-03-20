@@ -19,7 +19,9 @@ void i18n.init({
 		languages.map((language) => [
 			language,
 			extractTranslationNamespaces(
-				requireJson(`@rocket.chat/i18n/dist/resources/${language}.i18n.json`) as unknown as Record<string, string>,
+				// TODO: commonjs is terrible but we don't have esm build yet
+				// eslint-disable-next-line @typescript-eslint/no-var-requires, import/no-dynamic-require
+				require(`@rocket.chat/i18n/dist/resources/${language}.i18n.json`) as unknown as Record<string, string>,
 			),
 		]),
 	),

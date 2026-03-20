@@ -2,12 +2,12 @@
 	"$schema": "https://json.schemastore.org/tsconfig",
 	"compilerOptions": {
 		"target": "es5",
-		"module": "Node16",
+		"module": "commonjs",
 
 		"esModuleInterop": true,
 		"skipLibCheck": true,
 		"forceConsistentCasingInFileNames": true,
-		"moduleResolution": "node16",
+		"moduleResolution": "node",
 		"resolveJsonModule": true,
 
 		"strict": true,

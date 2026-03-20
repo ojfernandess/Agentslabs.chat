@@ -5,7 +5,7 @@ import { startBroker } from '@rocket.chat/network-broker';
 import { startTracing } from '@rocket.chat/tracing';
 import polka from 'polka';
 
-import { i18n } from './i18n.js';
+import { i18n } from './i18n';
 
 const PORT = process.env.PORT || 3036;
 

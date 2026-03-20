@@ -4,7 +4,7 @@ import { UserStatus } from '@rocket.chat/core-typings';
 import { useUserPresence } from '@rocket.chat/ui-contexts';
 import { renderHook } from '@testing-library/react';
 
-import { mockAppRoot } from '../index.js';
+import { mockAppRoot } from '..';
 
 // TODO: this will live in `mock-providers` package
 function createFakeUser(overrides?: Partial<IUser>): IUser {

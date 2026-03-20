@@ -1,8 +1,6 @@
 {
 	"extends": "@rocket.chat/tsconfig/client.json",
 	"compilerOptions": {
-		"module": "ESNext",
-		"moduleResolution": "bundler",
 		"rootDirs": ["./src", "./"],
 		"outDir": "./dist"
 	},

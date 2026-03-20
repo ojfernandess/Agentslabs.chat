@@ -1,7 +1,6 @@
 {
 	"extends": "@rocket.chat/tsconfig/client.json",
 	"compilerOptions": {
-		"module": "Node16",
 		"rootDir": "./src",
 		"outDir": "./dist"
 	},

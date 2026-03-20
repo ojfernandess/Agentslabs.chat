@@ -1,4 +1,4 @@
-import type { RocketchatI18nKeys } from '@rocket.chat/i18n' with { 'resolution-mode': 'import' };
+import type { RocketchatI18nKeys } from '@rocket.chat/i18n';
 import { createContext } from 'react';
 
 export type TranslationLanguage = {

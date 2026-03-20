@@ -46,18 +46,6 @@ Variáveis típicas (ver também `.env.example`):
 
 ## 4. EasyPanel
 
-### Importante: Compose ≠ Dockerfile
-
-Se vir **`dockerfile parse error ... unknown instruction: services:`**, o EasyPanel está a correr **`docker build`** num ficheiro **Docker Compose**. São formatos diferentes:
-
-| O que queres | O que fazer no EasyPanel |
-|--------------|---------------------------|
-| Só a app (imagem já no GHCR) | **App** → fonte **Imagem Docker** → `ghcr.io/...` (não escolhas build por Dockerfile com o YAML do compose). |
-| App + Mongo no mesmo stack | **Add Service** → **Compose** (ou “Docker Compose”) → cola o conteúdo de `docker-compose.easypanel.yml` no editor do **Compose**, **não** no campo Dockerfile. |
-| Build a partir do Git com Dockerfile | Só faz sentido com um ficheiro `Dockerfile` real (instruções `FROM`/`RUN`). Este repo não tem Dockerfile na raiz para buildar o Rocket.Chat inteiro — usa a imagem do GHCR. |
-
-Se criaste a app com **GitHub + Dockerfile**, o EasyPanel pode gerar ou esperar um `Dockerfile` no código. **Não substituas** esse ficheiro pelo conteúdo de `docker-compose.easypanel.yml`.
-
 ### Serviço só com imagem (recomendado)
 
 1. **Project** → **Add Service** → **App**.
@@ -89,4 +77,3 @@ No EasyPanel, associe um domínio ao serviço da app e use **HTTPS**. O valor de
   3. Pacotes GHCR novos costumam ser **privados**. Para o EasyPanel puxar **sem** utilizador/senha: no GitHub abra o pacote → **Package settings** → **Change package visibility** → **Public**.
   4. Se quiser manter **privado**, no EasyPanel (Imagem Docker) preencha **Nome de utilizador** = `ojfernandess` e **Senha** = [Personal Access Token](https://github.com/settings/tokens) com scope **`read:packages`** (não use a password da conta).
   5. Nome da imagem: `ghcr.io/ojfernandess/agentslabs.chat:latest` (repositório em minúsculas; confira o nome exato na página do pacote no GitHub).
-- **`unknown instruction: services:` ao fazer build:** colou ou definiu **docker-compose** como **Dockerfile**. Use o tipo de serviço **Compose** para esse YAML, ou **Imagem Docker** só com `ghcr.io/...:latest` (ver secção 4).

@@ -14,13 +14,3 @@ runs:
       shell: bash
       run: |
         tar -xzf /tmp/RocketChat-packages-build.tar.gz -C .
-
-    - name: Fix rocketchat-i18n i18n path
-      shell: bash
-      run: |
-        set -euo pipefail
-        if [ ! -d packages/i18n/dist/resources ]; then
-          echo "::error::packages/i18n/dist/resources is missing (packages build output)."
-          exit 1
-        fi
-        ( cd apps/meteor/packages/rocketchat-i18n && rm -f i18n && ln -sfn ../../../../packages/i18n/dist/resources i18n )

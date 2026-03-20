@@ -20,7 +20,10 @@ const HorizontalTemplate = ({ children }: { children: ReactNode }): ReactElement
 	const customBackground = useAssetWithDarkModePath('background');
 
 	return (
-		<HorizontalWizardLayout background={customBackground} logo={<RegistrationBrandLogo hideLogo={hideLogo} src={customLogo} />}>
+		<HorizontalWizardLayout
+			background={customBackground}
+			logo={<RegistrationBrandLogo hideLogo={hideLogo} src={customLogo} />}
+		>
 			<HorizontalWizardLayoutAside>
 				<HorizontalWizardLayoutTitle>
 					<RegisterTitle />

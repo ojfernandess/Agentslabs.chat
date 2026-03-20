@@ -19,8 +19,6 @@ Agents Labs Chat PRO is a team communications platform. This repository is a pro
 
 ## Development
 
-- **CI / native builds / Jest:** see [docs/CI.md](docs/CI.md).
-
 - **Node:** 22.16.0 (see root `package.json` `engines`)
 - **Yarn:** 4.12.0  
 - Install: `yarn install`  

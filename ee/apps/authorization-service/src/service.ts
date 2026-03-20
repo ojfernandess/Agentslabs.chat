@@ -17,7 +17,7 @@ void (async () => {
 	api.setBroker(startBroker());
 
 	// need to import service after models are registered
-	const { Authorization } = await import('../../../../apps/meteor/server/services/authorization/service.js');
+	const { Authorization } = await import('../../../../apps/meteor/server/services/authorization/service');
 
 	api.registerService(new Authorization());
 

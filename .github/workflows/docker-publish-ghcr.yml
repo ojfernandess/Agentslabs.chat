@@ -6,8 +6,6 @@ name: Publish Docker image (GHCR / EasyPanel)
 on:
   workflow_dispatch:
   push:
-    branches:
-      - main
     tags:
       - 'v*'
 
