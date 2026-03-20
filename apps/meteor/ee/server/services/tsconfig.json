@@ -1,5 +1,9 @@
 {
 	"extends": "../../../tsconfig.json",
+	"compilerOptions": {
+		"module": "Node16",
+		"moduleResolution": "node16"
+	},
 	"include": ["./**/*", "../../../../../ee/apps/account-service/src/lib"],
 	"exclude": ["./dist", "./ecosystem.config.js", "../../../definition/methods"]
 }
