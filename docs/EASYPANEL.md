@@ -16,7 +16,7 @@ git push -u origin main
 ```
 
 - Garanta que **não** commita ficheiros ignorados (`.env`, `node_modules`, `.tools/`).
-- Opcional: em **Settings → Actions → General**, permita *Read and write permissions* para `GITHUB_TOKEN` no repositório (para publicar no GHCR).
+- Obrigatório para publicar no GHCR: **Settings → Actions → General** → *Workflow permissions* → **Read and write permissions** → guardar. Sem isto, o workflow não consegue fazer *push* da imagem.
 
 ## 2. Imagem Docker no GitHub Container Registry (GHCR)
 
@@ -46,6 +46,18 @@ Variáveis típicas (ver também `.env.example`):
 
 ## 4. EasyPanel
 
+### Importante: Compose ≠ Dockerfile
+
+Se vir **`dockerfile parse error ... unknown instruction: services:`**, o EasyPanel está a correr **`docker build`** num ficheiro **Docker Compose**. São formatos diferentes:
+
+| O que queres | O que fazer no EasyPanel |
+|--------------|---------------------------|
+| Só a app (imagem já no GHCR) | **App** → fonte **Imagem Docker** → `ghcr.io/...` (não escolhas build por Dockerfile com o YAML do compose). |
+| App + Mongo no mesmo stack | **Add Service** → **Compose** (ou “Docker Compose”) → cola o conteúdo de `docker-compose.easypanel.yml` no editor do **Compose**, **não** no campo Dockerfile. |
+| Build a partir do Git com Dockerfile | Só faz sentido com um ficheiro `Dockerfile` real (instruções `FROM`/`RUN`). Este repo não tem Dockerfile na raiz para buildar o Rocket.Chat inteiro — usa a imagem do GHCR. |
+
+Se criaste a app com **GitHub + Dockerfile**, o EasyPanel pode gerar ou esperar um `Dockerfile` no código. **Não substituas** esse ficheiro pelo conteúdo de `docker-compose.easypanel.yml`.
+
 ### Serviço só com imagem (recomendado)
 
 1. **Project** → **Add Service** → **App**.
@@ -71,4 +83,10 @@ No EasyPanel, associe um domínio ao serviço da app e use **HTTPS**. O valor de
 
 - **Build Actions a falhar por memória:** usamos swap no workflow; em self-hosted runners, reserve pelo menos **8 GB RAM** + espaço em disco.
 - **App não liga ao Mongo:** confirme replica set e que `MONGO_URL` inclui `replicaSet=...`.
-- **403 no pull da imagem:** pacote GHCR privado → PAT com `read:packages` no registry do EasyPanel.
+- **`Head ... ghcr.io/.../manifests/latest: denied` (EasyPanel / docker pull):** o registo recusou o pedido. Ordem de verificação:
+  1. O workflow **Publish Docker image** correu até ao fim com sucesso? Em **Actions** deve estar verde; em **github.com/ojfernandess?tab=packages** (ou a página *Packages* do repo) deve existir o pacote `agentslabs.chat` com tag `latest`.
+  2. Se o workflow nunca publicou, não há imagem — corra o workflow ou corrija erros (permissões, `NPM_TOKEN`, etc.).
+  3. Pacotes GHCR novos costumam ser **privados**. Para o EasyPanel puxar **sem** utilizador/senha: no GitHub abra o pacote → **Package settings** → **Change package visibility** → **Public**.
+  4. Se quiser manter **privado**, no EasyPanel (Imagem Docker) preencha **Nome de utilizador** = `ojfernandess` e **Senha** = [Personal Access Token](https://github.com/settings/tokens) com scope **`read:packages`** (não use a password da conta).
+  5. Nome da imagem: `ghcr.io/ojfernandess/agentslabs.chat:latest` (repositório em minúsculas; confira o nome exato na página do pacote no GitHub).
+- **`unknown instruction: services:` ao fazer build:** colou ou definiu **docker-compose** como **Dockerfile**. Use o tipo de serviço **Compose** para esse YAML, ou **Imagem Docker** só com `ghcr.io/...:latest` (ver secção 4).

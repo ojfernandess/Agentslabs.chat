@@ -1,9 +1,15 @@
+# =============================================================================
+# Isto é DOCKER COMPOSE (vários serviços), NÃO é um Dockerfile.
+# NÃO coloque este ficheiro no campo "Dockerfile" do EasyPanel — dá erro:
+#   "unknown instruction: services:"
+#
+# No EasyPanel: crie um serviço do tipo "Compose" / "Docker Compose" e cole
+# este YAML aí. Ou use só "Imagem Docker" (GHCR) + Mongo noutro serviço.
+# =============================================================================
+#
 # Stack de referência: app (imagem GHCR) + MongoDB com replica set.
 # 1) Rode o workflow "Publish Docker image (GHCR / EasyPanel)" no GitHub.
-# 2) Imagem publicada pelo workflow GHCR (ajuste a tag se necessário).
-#
-# No EasyPanel: pode usar "Docker Compose" colando este ficheiro, ou criar Mongo à parte
-# e apontar MONGO_URL/MONGO_OPLOG_URL para o cluster (ex.: Atlas com ?replicaSet=).
+# 2) Ajuste a tag da imagem abaixo se necessário.
 
 services:
   mongo:

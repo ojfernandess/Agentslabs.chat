@@ -44,6 +44,11 @@
 		"@rocket.chat/meteor#build:ci": {
 			"env": ["BABEL_ENV"],
 			"cache": false
+		},
+		"@rocket.chat/sha256#build": {
+			"dependsOn": ["^build"],
+			"outputs": ["dist/**"],
+			"cache": false
 		}
 	}
 }
