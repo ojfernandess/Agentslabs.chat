@@ -8,10 +8,29 @@ Package.describe({
 const additionalPackages = {};
 
 const fs = Npm.require('fs');
+const path = Npm.require('path');
+
+/** Git on Windows may check out the symlink as a plain file containing the target path; Meteor needs a real dir or symlink. */
+function ensureI18nDir(rocketchatI18nRoot) {
+	const i18nPath = path.join(rocketchatI18nRoot, 'i18n');
+	if (!fs.existsSync(i18nPath)) {
+		return i18nPath;
+	}
+	const st = fs.lstatSync(i18nPath);
+	if (st.isFile()) {
+		const rel = fs.readFileSync(i18nPath, 'utf8').trim();
+		const resolved = path.resolve(rocketchatI18nRoot, rel);
+		fs.unlinkSync(i18nPath);
+		const target = path.relative(rocketchatI18nRoot, resolved);
+		fs.symlinkSync(target, i18nPath);
+	}
+	return i18nPath;
+}
 
 Package.onUse(function (api) {
 	const workingDir = process.env.PWD || '.';
-	const i18nDir = `${workingDir}/packages/rocketchat-i18n/i18n`;
+	const rocketchatI18nRoot = `${workingDir}/packages/rocketchat-i18n`;
+	const i18nDir = ensureI18nDir(rocketchatI18nRoot);
 
 	Object.keys(additionalPackages).forEach(function (current) {
 		const fullPath = `${workingDir}/packages/${additionalPackages[current]}`;
