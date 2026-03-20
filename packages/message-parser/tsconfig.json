@@ -3,6 +3,7 @@
   "compilerOptions": {
     "rootDir": ".",
 		"target": "es2020",
-		"module": "Node16"
+		"module": "Node16",
+		"moduleResolution": "node16"
   }
 }
