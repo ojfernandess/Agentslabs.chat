@@ -1,5 +1,6 @@
 import { Settings } from '@rocket.chat/core-services';
-import { createMiddleware } from 'hono/dist/cjs/helper/factory/index.js';
+import type { Context, Next } from 'hono';
+import { createMiddleware } from 'hono/factory';
 import mem from 'mem';
 
 // cache for 60 seconds
@@ -33,7 +34,7 @@ function parseMatrixAuthorizationHeader(header: string): Record<string, string> 
 	return result;
 }
 
-export const isFederationDomainAllowedMiddleware = createMiddleware(async (c, next) => {
+export const isFederationDomainAllowedMiddleware = createMiddleware(async (c: Context, next: Next) => {
 	const allowList = await getAllowList();
 	if (!allowList || allowList.length === 0) {
 		// No restriction, allow all

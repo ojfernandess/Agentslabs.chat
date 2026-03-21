@@ -1,9 +1,9 @@
 import { errCodes, federationSDK } from '@rocket.chat/federation-sdk';
-import type { Context } from 'hono';
-import { createMiddleware } from 'hono/dist/cjs/helper/factory/index.js';
+import type { Context, Next } from 'hono';
+import { createMiddleware } from 'hono/factory';
 
 export const isAuthenticatedMiddleware = () =>
-	createMiddleware(async (c: Context, next) => {
+	createMiddleware(async (c: Context, next: Next) => {
 		try {
 			const { method } = c.req;
 			const body = c.req.raw.body ? await c.req.raw.clone().json() : undefined;
