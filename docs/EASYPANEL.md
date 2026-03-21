@@ -2,6 +2,8 @@
 
 Guia para publicar o **Agents Labs Chat PRO** no GitHub e correr no [EasyPanel](https://easypanel.io).
 
+Para correr a mesma imagem no **Docker Desktop** na tua máquina, vê [DOCKER_DESKTOP.md](./DOCKER_DESKTOP.md).
+
 ## 1. Repositório no GitHub
 
 Na pasta do projeto (com Git):
@@ -62,6 +64,7 @@ Variáveis típicas (ver também `.env.example`):
 2. Copie o conteúdo de `docker-compose.easypanel.yml`.
 3. Confirme `image: ghcr.io/ojfernandess/agentslabs.chat:latest` (ou a tag que publicou no GHCR).
 4. Defina `ROOT_URL` para o domínio HTTPS que o EasyPanel associar ao serviço (pode usar variáveis mágicas da documentação do EasyPanel, ex. domínio primário).
+5. O compose **não** mapeia `ports` no serviço `app` de propósito: no EasyPanel, ao ligar o **domínio** ao stack, indique a **porta interna `3000`** do contentor `app` (o proxy encaminha sem abrir porta no host). Isto evita o aviso *"ports is used in app. It might cause conflicts with other services"* e conflitos com a 3000 do VPS.
 
 ## 5. Domínio e HTTPS
 
@@ -69,6 +72,8 @@ No EasyPanel, associe um domínio ao serviço da app e use **HTTPS**. O valor de
 
 ## 6. Falhas comuns
 
+- **EasyPanel: *"ports is used in app. It might cause conflicts with other services"*** — retire o bloco `ports:` do serviço `app` no compose e use só o proxy do EasyPanel com **porta interna 3000** (o ficheiro de exemplo no repo já vem assim). Só volte a mapear `ports` se precisar de aceder à app **diretamente pelo IP:porta do VPS** (ex.: `3001:3000`).
+- **`Bind for 0.0.0.0:3000 failed: port is already allocated`:** acontece se ainda tiver `ports: - '3000:3000'` (ou similar) e essa porta no host já estiver ocupada. Remova `ports` e use o domínio do EasyPanel, ou mude para outra porta no host (ex.: `3001:3000`).
 - **Build Actions a falhar por memória:** usamos swap no workflow; em self-hosted runners, reserve pelo menos **8 GB RAM** + espaço em disco.
 - **App não liga ao Mongo:** confirme replica set e que `MONGO_URL` inclui `replicaSet=...`.
 - **`Head ... ghcr.io/.../manifests/latest: denied` (EasyPanel / docker pull):** o registo recusou o pedido. Ordem de verificação:

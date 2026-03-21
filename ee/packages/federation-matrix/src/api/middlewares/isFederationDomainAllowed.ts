@@ -1,5 +1,5 @@
 import { Settings } from '@rocket.chat/core-services';
-import { createMiddleware } from 'hono/factory';
+import { createMiddleware } from 'hono/dist/cjs/helper/factory/index.js';
 import mem from 'mem';
 
 // cache for 60 seconds

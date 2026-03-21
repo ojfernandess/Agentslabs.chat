@@ -1,0 +1,17 @@
+# Ambiente local (Docker Desktop): Mongo + app + acesso em http://localhost:3000
+# Inclui docker-compose.easypanel.yml e publica a porta da app no host.
+#
+# Uso na raiz do repositório:
+#   docker compose -f docker-compose.local.yml pull
+#   docker compose -f docker-compose.local.yml up -d
+#
+# Abra no navegador: http://localhost:3000
+# Não use só docker-compose.docker-desktop.yml — ele é apenas override; falta o stack base.
+
+include:
+  - docker-compose.easypanel.yml
+
+services:
+  app:
+    ports:
+      - '3000:3000'

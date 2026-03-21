@@ -1,6 +1,6 @@
 import { errCodes, federationSDK } from '@rocket.chat/federation-sdk';
-import { every } from 'hono/combine';
-import { createMiddleware } from 'hono/factory';
+import { every } from 'hono/dist/cjs/middleware/combine/index.js';
+import { createMiddleware } from 'hono/dist/cjs/helper/factory/index.js';
 
 import { isAuthenticatedMiddleware } from './isAuthenticated';
 

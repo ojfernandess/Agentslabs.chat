@@ -1,5 +1,5 @@
 import { Settings } from '@rocket.chat/core-services';
-import { createMiddleware } from 'hono/factory';
+import { createMiddleware } from 'hono/dist/cjs/helper/factory/index.js';
 
 export const isFederationEnabledMiddleware = createMiddleware(async (c, next) => {
 	// TODO use federationSDK to check if federation is enabled

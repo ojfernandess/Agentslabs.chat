@@ -1,5 +1,6 @@
-# Override para Docker Desktop: expõe a app em http://localhost:3000
-# Uso: docker compose -f docker-compose.easypanel.yml -f docker-compose.docker-desktop.yml up -d
+# Override opcional: expõe a app em http://localhost:3000
+# Preferível para uso local: docker-compose.local.yml (um comando só).
+# Alternativa: docker compose -f docker-compose.easypanel.yml -f docker-compose.docker-desktop.yml up -d
 services:
   app:
     ports:

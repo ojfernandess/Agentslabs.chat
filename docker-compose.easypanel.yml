@@ -4,6 +4,9 @@
 #
 # No EasyPanel: pode usar "Docker Compose" colando este ficheiro, ou criar Mongo à parte
 # e apontar MONGO_URL/MONGO_OPLOG_URL para o cluster (ex.: Atlas com ?replicaSet=).
+#
+# Sem mapeamento `ports:` no serviço app — o EasyPanel encaminha pelo proxy para a porta
+# interna 3000 e evita o aviso "ports might cause conflicts". Ver docs/EASYPANEL.md.
 
 services:
   mongo:
@@ -31,8 +34,11 @@ services:
     restart: on-failure
     depends_on:
       - mongo
-    ports:
-      - '3000:3000'
+    # Não usar `ports:` aqui: o EasyPanel mostra "ports might cause conflicts" e pode colidir
+    # com outros serviços no host. Associe o domínio ao serviço e use porta interna **3000**.
+    # Para testes diretos no host, descomente:  ports: [ "3001:3000" ]
+    expose:
+      - '3000'
     environment:
       NODE_ENV: production
       PORT: 3000
