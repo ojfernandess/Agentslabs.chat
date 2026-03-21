@@ -9,7 +9,7 @@
 	],
 	"scripts": {
 		"build": "rm -rf dist && tsc -p tsconfig.json",
-		"build-preview": "mkdir -p ../../.preview && cp -r ./dist ../../.preview/media-signaling",
+		"build-preview": "yarn build && mkdir -p ../../.preview && cp -r ./dist ../../.preview/media-signaling",
 		"dev": "tsc -p tsconfig.json --watch --preserveWatchOutput",
 		"lint": "eslint .",
 		"lint:fix": "eslint --fix .",
