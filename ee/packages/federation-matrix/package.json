@@ -30,6 +30,7 @@
 		"@rocket.chat/network-broker": "workspace:^",
 		"@rocket.chat/rest-typings": "workspace:^",
 		"emojione": "^4.5.0",
+		"hono": "^4.12.5",
 		"marked": "^16.1.2",
 		"mongodb": "6.16.0",
 		"pino": "10.3.1",
