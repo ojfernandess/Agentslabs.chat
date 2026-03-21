@@ -11,7 +11,7 @@ ENV NODE_ENV=production
 # federation-matrix imports hono/factory; Meteor bundle npm tree may omit hono — install explicitly.
 RUN cd /app/bundle/programs/server \
     && npm install --omit=dev \
-    && npm install hono@^4.12.5 --omit=dev --no-save
+    && npm install hono@4.12.5 --omit=dev --no-save
 
 FROM node:22.16.0-alpine3.20
 
@@ -24,7 +24,7 @@ ENV LANG=C.UTF-8
 # We don't use any NFS related tools in this image.
 # For the same reason of NFS using the gid, we can also use it as long as there are no conflicts in terms of running processes with the same egid (which is 1 in our case).
 # While 65533 raw gid could be used, renaming nogroup to rocketchat here for maximum compatibility with older debian image.
-# More info on nobody/nogroup - https://wiki.ubuntu.com/nobody
+# More info on nobody/nogroup - https://wiki.ubuntu.com/SystemGroups
 # Debian wiki - https://wiki.debian.org/SystemGroups
 # """
 # daemon: Some unprivileged daemons that need to write to files on disk run as daemon.daemon (e.g., portmap, atd, probably others).
@@ -48,9 +48,24 @@ ENV DEPLOY_METHOD=docker \
     ROOT_URL=http://localhost:3000 \
     Accounts_AvatarStorePath=/app/uploads
 
-USER rocketchat
-
 COPY --from=builder --chown=rocketchat:rocketchat /app /app
+
+# Se /app/bundle/programs/server/node_modules/hono não existir (imagem antiga ou npm incompleto no build), instala no arranque.
+RUN printf '%s\n' \
+    '#!/bin/sh' \
+    'set -e' \
+    'cd /app/bundle/programs/server' \
+    'if [ ! -d node_modules/hono ]; then' \
+    '  echo "[docker-entrypoint] hono missing under programs/server; installing..."' \
+    '  npm install hono@4.12.5 --omit=dev --no-save' \
+    'fi' \
+    'cd /app/bundle' \
+    'exec node main.js' \
+    > /docker-entrypoint.sh \
+    && chmod 755 /docker-entrypoint.sh \
+    && chown rocketchat:rocketchat /docker-entrypoint.sh
+
+USER rocketchat
 
 VOLUME /app/uploads
 
@@ -58,4 +73,4 @@ WORKDIR /app/bundle
 
 EXPOSE 3000
 
-CMD ["node", "main.js"]
+ENTRYPOINT ["/docker-entrypoint.sh"]
