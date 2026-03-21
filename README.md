@@ -17,6 +17,22 @@ Agents Labs Chat PRO is a team communications platform. This repository is a pro
 - **`.env.example`** — variáveis mínimas (`ROOT_URL`, `MONGO_URL`, `MONGO_OPLOG_URL`).
 - **`docker-compose.easypanel.yml`** — exemplo com MongoDB em replica set + app; substitua a imagem `ghcr.io/...` pela sua.
 
+## Docker Desktop (imagem GHCR)
+
+1. Arranque o **Docker Desktop** (Windows/macOS).
+2. Se a imagem no GHCR for **privada**, faça login: `docker login ghcr.io -u SEU_USER_GITHUB` (password = PAT com `read:packages`).
+3. Na raiz do repositório:
+
+   ```bash
+   docker compose -f docker-compose.easypanel.yml -f docker-compose.docker-desktop.yml pull
+   docker compose -f docker-compose.easypanel.yml -f docker-compose.docker-desktop.yml up -d
+   ```
+
+4. Abra **http://localhost:3000** (o override mapeia `3000:3000`; se a 3000 estiver ocupada no PC, altere a primeira porta nesse ficheiro, ex. `3001:3000`).
+5. Parar: `docker compose -f docker-compose.easypanel.yml -f docker-compose.docker-desktop.yml down`
+
+Precisa de uma imagem já publicada (workflow *Publish Docker image* no GitHub). Ajuste a tag em `docker-compose.easypanel.yml` se não usar `:latest`.
+
 ## Development
 
 - **Node:** 22.16.0 (see root `package.json` `engines`)
