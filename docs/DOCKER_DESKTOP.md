@@ -124,7 +124,7 @@ O `docker-compose.local.yml` usa **imagem pronta** do GHCR (`image:`), não um `
 
 1. **Imagem desatualizada** — faça `pull` da tag mais recente (`:latest` ou o SHA do commit que publicou a imagem).
 2. **Mongo** — confirme que o serviço `mongo` está `Up` (`docker compose -f docker-compose.local.yml ps`). Sem Mongo com replica set, a app também pode falhar depois de arrancar.
-3. A imagem inclui um *entrypoint* que instala `hono` em `/app/bundle/programs/server` se a pasta `node_modules/hono` não existir (útil em imagens antigas). É preciso **rede** nesse arranque para o `npm install`.
+3. A imagem inclui um *entrypoint* que instala `hono` e cria **shims** em `node_modules/hono/factory` e `.../combine` (o Meteor não usa `package.json#exports` para subpaths como `hono/factory`). É preciso **rede** no primeiro arranque se o *entrypoint* tiver de correr `npm install`.
 
 ## Resumo
 
